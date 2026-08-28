@@ -8,24 +8,17 @@
 # Keep a copy of this script somewhere permanent on your machine (it doesn't
 # need to live inside the fresh project first) — e.g. ~/dev-scripts/ — and
 # run it with `bash ~/dev-scripts/apply-template.sh` from each new project.
-
 set -e
-
-# TODO: set this to your actual GitHub path once the template repo is pushed
-TEMPLATE_REPO="YOUR_GITHUB_USERNAME/latz-sanity-studio-template"
+TEMPLATE_REPO="latz09/latz-cms-template"
 TMP_DIR=".template-tmp"
-
 echo "Pulling template from ${TEMPLATE_REPO}..."
 npx degit "${TEMPLATE_REPO}" "${TMP_DIR}" --force
-
 echo "Overlaying standard files..."
 cp -r "${TMP_DIR}/schemaTypes" .
 cp "${TMP_DIR}/structure.js" .
 cp -r "${TMP_DIR}/components" .
 cp "${TMP_DIR}/sanity.config.js" .
-
 rm -rf "${TMP_DIR}"
-
 echo ""
 echo "Done. Left to do:"
 echo "  1. Set 'title' in sanity.config.js to the client's name"
