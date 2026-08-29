@@ -4,8 +4,8 @@
 # Run this from inside a project folder right after `npm create sanity@latest`.
 # It pulls this template and overwrites Sanity's default scaffold with the
 # standard schema stubs, structure.js, components, and sanity.config.js —
-# then restores the real projectId/dataset the CLI just generated, since the
-# template's sanity.config.js only has placeholders for those.
+# then restores the real projectId/dataset the CLI just wrote into the
+# scaffolded sanity.config.js, before that file gets replaced.
 #
 # Keep a copy of this script somewhere permanent on your machine (it doesn't
 # need to live inside the fresh project first) — e.g. ~/dev-scripts/ — and
@@ -16,17 +16,19 @@ set -e
 TEMPLATE_REPO="latz09/latz-cms-template"
 TMP_DIR=".template-tmp"
 
-extract_env_var() {
+extract_config_value() {
   local key="$1"
-  if [ -f .env ]; then
-    grep "^${key}=" .env | head -n1 | cut -d'=' -f2- | tr -d '"\r'
+  if [ -f sanity.config.js ]; then
+    grep -m1 "${key}:" sanity.config.js | sed -E "s/.*${key}:[[:space:]]*['\"]([^'\"]+)['\"].*/\1/"
   fi
 }
 
 # Grab the real projectId/dataset the CLI just wrote, before we overwrite
-# sanity.config.js with the template's placeholder version.
-PROJECT_ID=$(extract_env_var "SANITY_STUDIO_PROJECT_ID")
-DATASET=$(extract_env_var "SANITY_STUDIO_DATASET")
+# sanity.config.js with the template's placeholder version. Reading it from
+# this file (rather than .env) doesn't depend on any particular CLI prompt —
+# the Studio can't run without a real projectId here, so it's always present.
+PROJECT_ID=$(extract_config_value "projectId")
+DATASET=$(extract_config_value "dataset")
 
 echo "Pulling template from ${TEMPLATE_REPO}..."
 npx degit "${TEMPLATE_REPO}" "${TMP_DIR}" --force
@@ -43,11 +45,12 @@ if [ -n "$PROJECT_ID" ]; then
   sed -i.bak "s/projectId: 'PROJECT_ID'/projectId: '${PROJECT_ID}'/" sanity.config.js
   echo "  projectId restored: ${PROJECT_ID}"
 else
-  echo "  WARNING: no .env found — set projectId in sanity.config.js manually."
+  echo "  WARNING: couldn't find projectId in the scaffolded sanity.config.js — set it manually."
 fi
 
 if [ -n "$DATASET" ]; then
   sed -i.bak "s/dataset: 'production'/dataset: '${DATASET}'/" sanity.config.js
+  echo "  dataset restored: ${DATASET}"
 fi
 rm -f sanity.config.js.bak
 
