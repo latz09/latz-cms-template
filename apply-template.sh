@@ -41,6 +41,9 @@ cp "${TMP_DIR}/sanity.config.js" .
 
 rm -rf "${TMP_DIR}"
 
+echo "Installing @sanity/themer..."
+npm install @sanity/themer
+
 if [ -n "$PROJECT_ID" ]; then
   sed -i.bak "s/projectId: 'PROJECT_ID'/projectId: '${PROJECT_ID}'/" sanity.config.js
   echo "  projectId restored: ${PROJECT_ID}"

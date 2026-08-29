@@ -1,11 +1,16 @@
 /* eslint-disable no-undef */
+import { createElement } from 'react'
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { schemaTypes } from './schemaTypes/index.js'
 import { structure, singletonActions, singletonNewDocument } from './structure'
 import CustomLayout from './components/CustomLayout.jsx'
 import clientLogo from './components/clientLogo.jsx'
-import { theme } from 'https://themer.sanity.build/api/hues?default=6b7280;lightest:f9fafb;darkest:111827&primary=18a1ad;lightest:f0feff;darkest:0d4f56&transparent=f2fcfe;100;darkest:e6f7fb&positive=779e43;lightest:f7f9f2;darkest:3d4f22&caution=f59e0b;lightest:fef3c7;darkest:92400e&critical=ef4444;lightest:fef2f2;darkest:991b1b'
+import { buildThemeFromUrl } from '@sanity/themer/legacy'
+
+const theme = buildThemeFromUrl(
+  'https://themer.sanity.build/api/hues?default=6b7280;lightest:f9fafb;darkest:111827&primary=18a1ad;lightest:f0feff;darkest:0d4f56&transparent=f2fcfe;100;darkest:e6f7fb&positive=779e43;lightest:f7f9f2;darkest:3d4f22&caution=f59e0b;lightest:fef3c7;darkest:92400e&critical=ef4444;lightest:fef2f2;darkest:991b1b'
+)
 
 // NOTE: no presentationTool/Live Preview plugin here on purpose — not in
 // use for client projects right now. Add it back in when that's live.
@@ -42,7 +47,11 @@ export default defineConfig({
   },
   studio: {
     components: {
-      layout: (props) => <CustomLayout {...props} cmsGuideUrl="/static/cms-guide.pdf" />,
+      // createElement instead of JSX — Vite's oxc transform doesn't parse
+      // JSX in .js files, and this project keeps everything .js by
+      // convention rather than renaming this one file to .jsx.
+      layout: (props) =>
+        createElement(CustomLayout, { ...props, cmsGuideUrl: '/static/cms-guide.pdf' }),
     },
   },
 })
