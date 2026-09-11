@@ -57,6 +57,13 @@ if [ -n "$DATASET" ]; then
 fi
 rm -f sanity.config.js.bak
 
+if [ ! -d node_modules/@sanity/themer ]; then
+  echo ""
+  echo "WARNING: @sanity/themer isn't in node_modules — the install step"
+  echo "may have silently failed. Run 'npm ls @sanity/themer' to confirm,"
+  echo "and 'npm install @sanity/themer' manually if it's missing."
+fi
+
 echo ""
 echo "Done. Left to do:"
 echo "  1. Set 'title' in sanity.config.js to the client's name"
